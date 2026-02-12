@@ -15,7 +15,7 @@ class MainWindow(QMainWindow):
 		self.log.setReadOnly(True)
 
 		self.devices = QComboBox()
-		self.refresh_devices()
+		#self.refresh_devices()
 
 		self.flash_btn = QPushButton("Flash")
 		self.flash_btn.clicked.connect(self.flash)

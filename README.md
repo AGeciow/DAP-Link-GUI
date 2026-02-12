@@ -2,7 +2,9 @@
 
 GUI + CLI programmer for CMSIS-DAP / DAP-Link probes.
 
-## Install
+## Run
 
 ```bash
-pip install -r requirements.txt
+nix-shell
+python --version   # Python 3.12.x
+python run_gui.py

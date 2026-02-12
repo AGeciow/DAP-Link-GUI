@@ -2,36 +2,32 @@ from pyocd.core.helpers import ConnectHelper
 from pyocd.flash.file_programmer import FileProgrammer
 from .backend import ProgrammerBackend
 
-
 class PyOCDBackend(ProgrammerBackend):
+	def __init__(self):
+		self.session = None
+		self.target = None
+		
+	def list_probes(self):
+		probes = ConnectHelper.get_all_connected_probes()
+		return [p.unique_id for p in probes]
 
-    def __init__(self):
-        self.session = None
-        self.target = None
+	def connect(self, probe_uid=None):
+		self.session = ConnectHelper.session_with_choden_probe(unique_id=probe_uid)
+		if self.session is None:
+			raise RuntimeError("No probe found")
 
-    def list_probes(self):
-        probes = ConnectHelper.get_all_connected_probes()
-        return [p.unique_id for p in probes]
+		self.session.open()
+		self.target = self.session.board.target
 
-    def connect(self, probe_uid=None):
-        self.session = ConnectHelper.session_with_chosen_probe(
-            unique_id=probe_uid
-        )
-        if self.session is None:
-            raise RuntimeError("No probe found")
+	def flash(self, firmware):
+		FileProgrammer(self.session).program(firmware)
 
-        self.session.open()
-        self.target = self.session.board.target
+	def erase(self, mode="chip"):
+		self.target.mass_erase()
 
-    def flash(self, firmware):
-        FileProgrammer(self.session).program(firmware)
+	def reset(self):
+		self.target.reset()
 
-    def erase(self, mode="chip"):
-        self.target.mass_erase()
-
-    def reset(self):
-        self.target.reset()
-
-    def disconnect(self):
-        if self.session:
-            self.session.close()
+	def disconnect(self):
+		if self.session:
+			self.session.close()
